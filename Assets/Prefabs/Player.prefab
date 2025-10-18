@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1740031578870307697}
   serializedVersion: 2
   m_LocalRotation: {x: -0.000000011175871, y: -0, z: -0.00000007543713, w: 1}
-  m_LocalPosition: {x: 0.07120307, y: 1.2174115, z: 0.30147374}
+  m_LocalPosition: {x: -0.164, y: 1.322, z: 0.30147374}
   m_LocalScale: {x: 0.73483986, y: 0.7348401, z: 0.73484015}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -389,8 +389,9 @@ MonoBehaviour:
   _dashCooldownText: {fileID: 9011792323112392107}
   moveSpeed: 7
   accelerationTime: 0.1
+  turnSpeedMultiplier: 15
   _aimBodyWeight: 0.6
-  _maxAimAngle: 80
+  _aimHeadWeight: 1
   _dashImpulseSource: {fileID: 461183940147899398}
   _gunshotImpulseSource: {fileID: 0}
 --- !u!114 &461183940147899398

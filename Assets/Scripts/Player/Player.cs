@@ -15,15 +15,11 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float accelerationTime = 0.1f;
 
-    [Header("Aiming IK Settings")]
-    [Range(0, 1)]
-    [Tooltip("How much the body (spine) contributes to aiming.")]
-    [SerializeField] private float _aimBodyWeight = 0.4f;
-    [Range(0, 1)]
-    [Tooltip("How much the head contributes to aiming. Set to 1 for perfect head tracking.")]
-    [SerializeField] private float _aimHeadWeight = 1f;
-    [Tooltip("The angle at which the whole body will start to turn.")]
-    [SerializeField] private float _maxAimAngle = 80f;
+    [Header("Aiming Settings")]
+    [Tooltip("Adjust this value until the character's model faces the exact direction of the shots.")]
+    [SerializeField] private float _rotationOffset = 0f;
+    [Tooltip("How quickly the character turns to face the aim direction.")]
+    [SerializeField] private float _rotationSpeed = 25f;
     
     [Header("Impulse Sources")]
     [SerializeField] private CinemachineImpulseSource _dashImpulseSource;
@@ -46,11 +42,10 @@ public class Player : MonoBehaviour
         _controller = GetComponent<CharacterController>();
         var mainCamera = Camera.main;
         
-        // Aiming system uses the stable root transform for its calculations.
         _aiming = new PlayerAiming(mainCamera, transform);
-
         _movement = new PlayerMovement(_controller, mainCamera.transform, moveSpeed, accelerationTime);
         _shooting = new PlayerShooting(transform, _firePoint, _bulletPrefab);
+        
         if (_dashCooldownText != null) _dashCooldownText.gameObject.SetActive(false);
         _lastRotation = transform.rotation;
     }
@@ -59,7 +54,14 @@ public class Player : MonoBehaviour
     {
         _aiming.Tick();
         _movement.Tick();
-        _shooting.Tick(_aiming.AimDirection);
+
+        // --- SHOOTING LOGIC ---
+        // This calculation is precise. The bullet direction is determined from the gun's muzzle
+        // to the cursor's world position, flattened to the horizontal plane.
+        Vector3 shootDirection = _aiming.AimPosition - _firePoint.position;
+        shootDirection.y = 0; 
+        _shooting.Tick(shootDirection.normalized);
+
         UpdateAnimator();
         UpdateDashCooldownUI();
         if (_movement.JustDashed && _dashImpulseSource != null) _dashImpulseSource.GenerateImpulse();
@@ -68,38 +70,25 @@ public class Player : MonoBehaviour
     
     void LateUpdate()
     {
-        float angle = Vector3.SignedAngle(transform.forward, _aiming.AimDirection, Vector3.up);
-        if (Mathf.Abs(angle) > _maxAimAngle)
+        // --- ROTATION LOGIC ---
+        // The character ALWAYS rotates to face the cursor. No more conditional rotation.
+        Vector3 lookDirection = _aiming.AimPosition - transform.position;
+        lookDirection.y = 0;
+
+        if (lookDirection.sqrMagnitude > 0.01f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(_aiming.AimDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 15f);
+            // Standard rotation to look towards a point.
+            Quaternion targetLookRotation = Quaternion.LookRotation(lookDirection);
+            
+            // Apply the manual offset here to correct the model's alignment.
+            Quaternion finalRotation = targetLookRotation * Quaternion.Euler(0, _rotationOffset, 0);
+
+            // Smoothly rotate the character to the final, corrected rotation.
+            transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, Time.deltaTime * _rotationSpeed);
         }
+        
         CalculateTurnSpeed();
     }
-
-    // This is the clean, standard Unity way to make a character look at a target.
-    private void OnAnimatorIK(int layerIndex)
-    {
-        if (_animator == null || _aiming == null) return;
-
-        // Set how much the body, head, and eyes will be influenced by the IK.
-        _animator.SetLookAtWeight(1f, _aimBodyWeight, _aimHeadWeight, 1f, 0.5f);
-        
-        // --- THE DEFINITIVE FIX ---
-
-        // 1. Find the head bone. If it doesn't exist, do nothing.
-        Transform headBone = _animator.GetBoneTransform(HumanBodyBones.Head);
-        if (headBone == null) return;
-
-        // 2. Create a target point far away, but starting from the HEAD's position, not the feet.
-        // This creates a sightline at the correct height, forcing a perfect horizontal aim.
-        Vector3 lookAtTarget = headBone.position + (_aiming.AimDirection * 100f);
-
-        // 3. Tell the Animator to look at this point. It will handle rotating the
-        // head and spine bones automatically to achieve the correct look.
-        _animator.SetLookAtPosition(lookAtTarget);
-    }
-    
     
     private void CalculateTurnSpeed(){ Quaternion currentRotation = transform.rotation; Quaternion deltaRotation = currentRotation * Quaternion.Inverse(_lastRotation); deltaRotation.ToAngleAxis(out float angle, out Vector3 axis); if (float.IsNaN(axis.x)) return; float turnDirection = Mathf.Sign(axis.y); float turnAnglePerSecond = (angle * turnDirection) / Time.deltaTime; _turnSpeed = Mathf.Lerp(_turnSpeed, Mathf.Clamp(turnAnglePerSecond / 360f, -1f, 1f), Time.deltaTime * 20f); _lastRotation = currentRotation; }
     private void UpdateAnimator(){ if (_animator == null) return; Vector3 horizontalVelocity = new Vector3(_controller.velocity.x, 0, _controller.velocity.z); float currentSpeed = horizontalVelocity.magnitude; Vector3 localVelocity = transform.InverseTransformDirection(horizontalVelocity); _animator.SetFloat(_speedHash, currentSpeed); _animator.SetFloat(_turnSpeedHash, _turnSpeed); _animator.SetFloat(_moveXHash, localVelocity.x / moveSpeed); _animator.SetFloat(_moveYHash, localVelocity.z / moveSpeed); }
