@@ -13,7 +13,6 @@ public class PlayerMovement
 
     // --- References ---
     private readonly CharacterController _controller;
-    private readonly Transform _transform;
     private readonly Transform _cameraTransform;
 
     // --- State ---
@@ -22,7 +21,6 @@ public class PlayerMovement
     private float _dashCooldownTimer;
     private float _dashTimer;
     private bool _isDashing;
-    private Vector3 _dashDirection;
 
     // --- Public State ---
     public bool JustDashed { get; private set; }
@@ -31,7 +29,6 @@ public class PlayerMovement
     public PlayerMovement(CharacterController controller, Transform cameraTransform, float moveSpeed, float accelerationTime)
     {
         _controller = controller;
-        _transform = controller.transform;
         _cameraTransform = cameraTransform;
         _moveSpeed = moveSpeed;
         _accelerationTime = accelerationTime;
@@ -40,77 +37,55 @@ public class PlayerMovement
     public void Tick()
     {
         JustDashed = false; 
-        Vector3 inputDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
-        HandleDashState(inputDirection);
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        float verticalInput = Input.GetAxisRaw("Vertical");
+
+        // --- Camera-Relative Direction Calculation ---
+        // Get camera's forward and right vectors, then flatten them on the XZ plane.
+        Vector3 camForward = _cameraTransform.forward;
+        camForward.y = 0;
+        camForward.Normalize();
+
+        Vector3 camRight = _cameraTransform.right;
+        camRight.y = 0;
+        camRight.Normalize();
+        
+        // Combine inputs with camera vectors to get the final world-space direction.
+        Vector3 moveDirection = (camForward * verticalInput + camRight * horizontalInput).normalized;
+
+        // --- State Handling ---
+        HandleDashState(moveDirection);
 
         if (_isDashing)
         {
-            _controller.Move(_dashDirection * _dashSpeed * Time.deltaTime);
+            // During a dash, we use the calculated move direction at full dash speed.
+            _controller.Move(moveDirection * _dashSpeed * Time.deltaTime);
             return;
         }
 
-        HandleMovement(inputDirection);
-    }
-
-    private void HandleMovement(Vector3 inputDirection)
-    {
-        Vector3 targetVelocity;
-        if (inputDirection.magnitude >= 0.1f)
-        {
-            Vector3 camForward = _cameraTransform.forward;
-            Vector3 camRight = _cameraTransform.right;
-            camForward.y = 0;
-            camRight.y = 0;
-            camForward.Normalize();
-            camRight.Normalize();
-            
-            Vector3 targetDirection = (camForward * inputDirection.z + camRight * inputDirection.x).normalized;
-            targetVelocity = targetDirection * _moveSpeed;
-        }
-        else
-        {
-            targetVelocity = Vector3.zero;
-        }
-
+        // --- Standard Movement ---
+        // Apply regular movement speed to the calculated direction.
+        Vector3 targetVelocity = moveDirection * _moveSpeed;
         _currentMoveVelocity = Vector3.SmoothDamp(_currentMoveVelocity, targetVelocity, ref _velocityDamper, _accelerationTime);
         _controller.Move(_currentMoveVelocity * Time.deltaTime);
     }
 
-    private void HandleDashState(Vector3 inputDirection)
+    private void HandleDashState(Vector3 moveDirection)
     {
         if (_dashCooldownTimer > 0) _dashCooldownTimer -= Time.deltaTime;
+        
         if (_dashTimer > 0)
         {
             _dashTimer -= Time.deltaTime;
             if (_dashTimer <= 0) _isDashing = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && _dashCooldownTimer <= 0)
+        if (Input.GetKeyDown(KeyCode.Space) && _dashCooldownTimer <= 0 && moveDirection.sqrMagnitude > 0.1f)
         {
-            StartDash(inputDirection);
-        }
-    }
-
-    private void StartDash(Vector3 inputDirection)
-    {
-        JustDashed = true; 
-        _isDashing = true;
-        _dashCooldownTimer = _dashCooldown;
-        _dashTimer = _dashDuration;
-
-        if (inputDirection.magnitude >= 0.1f)
-        {
-            Vector3 camForward = _cameraTransform.forward;
-            Vector3 camRight = _cameraTransform.right;
-            camForward.y = 0;
-            camRight.y = 0;
-            camForward.Normalize();
-            camRight.Normalize();
-            _dashDirection = (camForward * inputDirection.z + camRight * inputDirection.x).normalized;
-        }
-        else
-        {
-            _dashDirection = _transform.forward;
+            JustDashed = true; 
+            _isDashing = true;
+            _dashCooldownTimer = _dashCooldown;
+            _dashTimer = _dashDuration;
         }
     }
 }
