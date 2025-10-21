@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
 {
     [Header("Dependencies")]
     [SerializeField] private Transform _firePoint;
+    [SerializeField] private ParticleSystem _firePointParticles;
     [SerializeField] private GameObject _bulletPrefab;
     [SerializeField] private Animator _animator;
     [SerializeField] private TextMeshProUGUI _dashCooldownText;
@@ -44,7 +45,7 @@ public class Player : MonoBehaviour
         
         _aiming = new PlayerAiming(mainCamera, transform);
         _movement = new PlayerMovement(_controller, mainCamera.transform, moveSpeed, accelerationTime);
-        _shooting = new PlayerShooting(transform, _firePoint, _bulletPrefab);
+        _shooting = new PlayerShooting(transform, _firePoint, _bulletPrefab, _firePointParticles);
         
         if (_dashCooldownText != null) _dashCooldownText.gameObject.SetActive(false);
         _lastRotation = transform.rotation;
@@ -59,13 +60,15 @@ public class Player : MonoBehaviour
         // This calculation is precise. The bullet direction is determined from the gun's muzzle
         // to the cursor's world position, flattened to the horizontal plane.
         Vector3 shootDirection = _aiming.AimPosition - _firePoint.position;
-        shootDirection.y = 0; 
+        shootDirection.y = 0;
         _shooting.Tick(shootDirection.normalized);
 
         UpdateAnimator();
         UpdateDashCooldownUI();
-        if (_movement.JustDashed && _dashImpulseSource != null) _dashImpulseSource.GenerateImpulse();
-        if (Input.GetMouseButtonDown(0) && _gunshotImpulseSource != null) _gunshotImpulseSource.GenerateImpulse();
+        if (_movement.JustDashed && _dashImpulseSource != null) 
+            _dashImpulseSource.GenerateImpulse();
+        if (Input.GetMouseButtonDown(0) && _gunshotImpulseSource != null) 
+            _gunshotImpulseSource.GenerateImpulse();
     }
     
     void LateUpdate()
@@ -89,8 +92,52 @@ public class Player : MonoBehaviour
         
         CalculateTurnSpeed();
     }
+
+    private void CalculateTurnSpeed()
+    {
+        Quaternion currentRotation = transform.rotation;
+        Quaternion deltaRotation = currentRotation * Quaternion.Inverse(_lastRotation);
+
+        deltaRotation.ToAngleAxis(out float angle, out Vector3 axis);
+
+        if (float.IsNaN(axis.x)) return;
+
+        float turnDirection = Mathf.Sign(axis.y);
+        float turnAnglePerSecond = (angle * turnDirection) / Time.deltaTime;
+
+        _turnSpeed = Mathf.Lerp(_turnSpeed, Mathf.Clamp(turnAnglePerSecond / 360f, -1f, 1f), Time.deltaTime * 20f);
+        _lastRotation = currentRotation;
+    }
+
+    private void UpdateAnimator()
+    {
+        if (_animator == null) return;
+
+        Vector3 horizontalVelocity = new(_controller.velocity.x, 0, _controller.velocity.z);
+
+        float currentSpeed = horizontalVelocity.magnitude;
+
+        Vector3 localVelocity = transform.InverseTransformDirection(horizontalVelocity);
+
+        _animator.SetFloat(_speedHash, currentSpeed);
+        _animator.SetFloat(_turnSpeedHash, _turnSpeed);
+        _animator.SetFloat(_moveXHash, localVelocity.x / moveSpeed);
+        _animator.SetFloat(_moveYHash, localVelocity.z / moveSpeed);
+    }
     
-    private void CalculateTurnSpeed(){ Quaternion currentRotation = transform.rotation; Quaternion deltaRotation = currentRotation * Quaternion.Inverse(_lastRotation); deltaRotation.ToAngleAxis(out float angle, out Vector3 axis); if (float.IsNaN(axis.x)) return; float turnDirection = Mathf.Sign(axis.y); float turnAnglePerSecond = (angle * turnDirection) / Time.deltaTime; _turnSpeed = Mathf.Lerp(_turnSpeed, Mathf.Clamp(turnAnglePerSecond / 360f, -1f, 1f), Time.deltaTime * 20f); _lastRotation = currentRotation; }
-    private void UpdateAnimator(){ if (_animator == null) return; Vector3 horizontalVelocity = new Vector3(_controller.velocity.x, 0, _controller.velocity.z); float currentSpeed = horizontalVelocity.magnitude; Vector3 localVelocity = transform.InverseTransformDirection(horizontalVelocity); _animator.SetFloat(_speedHash, currentSpeed); _animator.SetFloat(_turnSpeedHash, _turnSpeed); _animator.SetFloat(_moveXHash, localVelocity.x / moveSpeed); _animator.SetFloat(_moveYHash, localVelocity.z / moveSpeed); }
-    private void UpdateDashCooldownUI(){ if (_dashCooldownText == null) return; float cooldown = _movement.DashCooldownTimer; if (cooldown > 0) { _dashCooldownText.gameObject.SetActive(true); _dashCooldownText.text = cooldown.ToString("F1"); } else { _dashCooldownText.gameObject.SetActive(false); } }
+    private void UpdateDashCooldownUI()
+    {
+        if (_dashCooldownText == null) return;
+
+        float cooldown = _movement.DashCooldownTimer;
+        if (cooldown > 0)
+        {
+            _dashCooldownText.gameObject.SetActive(true);
+            _dashCooldownText.text = cooldown.ToString("F1");
+        }
+        else
+        {
+            _dashCooldownText.gameObject.SetActive(false);
+        }
+    }
 }

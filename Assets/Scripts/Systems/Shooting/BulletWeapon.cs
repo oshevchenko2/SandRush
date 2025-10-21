@@ -6,8 +6,7 @@ public class BulletWeapon : WeaponBase
     private readonly float _bulletSpeed = 25f;
     private readonly ObjectPool<Bullet> _bulletPool;
 
-    public BulletWeapon(Transform owner, Transform firePoint, GameObject bulletPrefab, int poolSize = 20)
-        : base(owner)
+    public BulletWeapon(Transform owner, Transform firePoint, GameObject bulletPrefab, int poolSize = 20) : base(owner)
     {
         _firePoint = firePoint;
 
@@ -19,8 +18,7 @@ public class BulletWeapon : WeaponBase
     {
         Bullet bullet = _bulletPool.GetObject();
 
-        bullet.transform.position = _firePoint.position;
-        bullet.transform.rotation = Quaternion.LookRotation(direction);
+        bullet.transform.SetPositionAndRotation(_firePoint.position, Quaternion.LookRotation(direction));
         bullet.Init(_bulletPool);
         bullet.Fire(direction, _bulletSpeed);
     }
