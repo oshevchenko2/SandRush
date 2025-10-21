@@ -3,9 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Bullet : MonoBehaviour
 {
+    [SerializeField] private GameObject _hitEffectPrefab;
+
     private Rigidbody _rb;
     private ObjectPool<Bullet> _pool;
-    private float _lifetime = 3f;
+    private readonly float _lifetime = 3f;
     private float _timer;
 
     public void Init(ObjectPool<Bullet> pool)
@@ -29,11 +31,17 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (other.CompareTag("Enemy"))
+        ContactPoint contact = collision.contacts[0];
+        Quaternion rot = Quaternion.LookRotation(contact.normal);
+        GameObject hitFx = Instantiate(_hitEffectPrefab, contact.point, rot);
+
+        Destroy(hitFx, 1f);
+
+        if (collision.collider.TryGetComponent<EnemyManager>(out var enemy))
         {
-            Debug.Log("Hit enemy: " + other.name);
+            enemy.TakeDamage(25f);
         }
 
         _pool.ReturnObject(this);
