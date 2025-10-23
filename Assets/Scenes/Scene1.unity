@@ -7861,8 +7861,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 64
-  m_fontSizeBase: 64
+  m_fontSize: 15
+  m_fontSizeBase: 15
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -15183,15 +15183,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2174959052661589294, guid: e6841c9f7fc38524da3040d8b17cf0bb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.7192569
+      value: -1.7105787
       objectReference: {fileID: 0}
     - target: {fileID: 2174959052661589294, guid: e6841c9f7fc38524da3040d8b17cf0bb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 19.454876
+      value: 19.455648
       objectReference: {fileID: 0}
     - target: {fileID: 2174959052661589294, guid: e6841c9f7fc38524da3040d8b17cf0bb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -13.178889
+      value: -13.178118
       objectReference: {fileID: 0}
     - target: {fileID: 2174959052661589294, guid: e6841c9f7fc38524da3040d8b17cf0bb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -16696,15 +16696,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1775955700745006579, guid: b91593d8d4e503246963b201e85391ad, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.7192569
+      value: -1.7105787
       objectReference: {fileID: 0}
     - target: {fileID: 1775955700745006579, guid: b91593d8d4e503246963b201e85391ad, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 19.454876
+      value: 19.455648
       objectReference: {fileID: 0}
     - target: {fileID: 1775955700745006579, guid: b91593d8d4e503246963b201e85391ad, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -13.178889
+      value: -13.178118
       objectReference: {fileID: 0}
     - target: {fileID: 1775955700745006579, guid: b91593d8d4e503246963b201e85391ad, type: 3}
       propertyPath: m_LocalRotation.w
@@ -16740,7 +16740,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6287758190479841792, guid: b91593d8d4e503246963b201e85391ad, type: 3}
       propertyPath: orthographic
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6287758190479841792, guid: b91593d8d4e503246963b201e85391ad, type: 3}
       propertyPath: field of view
@@ -19039,8 +19039,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 64
-  m_fontSizeBase: 64
+  m_fontSize: 15
+  m_fontSizeBase: 15
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
