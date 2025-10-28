@@ -38,6 +38,8 @@ public class Player : MonoBehaviour
     private readonly int _speedHash = Animator.StringToHash("Speed");
     private readonly int _turnSpeedHash = Animator.StringToHash("TurnSpeed");
 
+    [Range(25, 100)] public int CurrentHealth = 100;
+
     void Awake()
     {
         _controller = GetComponent<CharacterController>();
@@ -70,7 +72,7 @@ public class Player : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && _gunshotImpulseSource != null) 
             _gunshotImpulseSource.GenerateImpulse();
     }
-    
+
     void LateUpdate()
     {
         // --- ROTATION LOGIC ---
@@ -82,15 +84,23 @@ public class Player : MonoBehaviour
         {
             // Standard rotation to look towards a point.
             Quaternion targetLookRotation = Quaternion.LookRotation(lookDirection);
-            
+
             // Apply the manual offset here to correct the model's alignment.
             Quaternion finalRotation = targetLookRotation * Quaternion.Euler(0, _rotationOffset, 0);
 
             // Smoothly rotate the character to the final, corrected rotation.
             transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, Time.deltaTime * _rotationSpeed);
         }
-        
+
         CalculateTurnSpeed();
+    }
+    
+    public void TakeDamage(int amount)
+    {
+        CurrentHealth -= amount;
+        CurrentHealth = Mathf.Clamp(CurrentHealth, 0, 100);
+
+        HealthUI.UpdateHealth(CurrentHealth);
     }
 
     private void CalculateTurnSpeed()
