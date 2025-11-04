@@ -12,10 +12,7 @@ public class Spike : MonoBehaviour
 
         if (other.CompareTag("Player"))
         {
-            if (other.TryGetComponent<Player>(out var player))
-            {
-                Player.TakeDamage(_damage);
-            }
+            Player.TakeDamage(_damage);
 
             _hasActivated = true;
             Destroy(gameObject, 0.1f);
