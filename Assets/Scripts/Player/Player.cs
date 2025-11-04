@@ -38,6 +38,11 @@ public class Player : MonoBehaviour
     private readonly int _speedHash = Animator.StringToHash("Speed");
     private readonly int _turnSpeedHash = Animator.StringToHash("TurnSpeed");
 
+    [Range(25, 100)] public int CurrentHealth = 100;
+    [Range(0, 10)] public int CurrentUltimate = 0;
+
+    private static Player _instance;
+
     void Awake()
     {
         _controller = GetComponent<CharacterController>();
@@ -49,6 +54,7 @@ public class Player : MonoBehaviour
         
         if (_dashCooldownText != null) _dashCooldownText.gameObject.SetActive(false);
         _lastRotation = transform.rotation;
+        _instance = this;
     }
 
     void Update()
@@ -70,7 +76,7 @@ public class Player : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && _gunshotImpulseSource != null) 
             _gunshotImpulseSource.GenerateImpulse();
     }
-    
+
     void LateUpdate()
     {
         // --- ROTATION LOGIC ---
@@ -82,15 +88,31 @@ public class Player : MonoBehaviour
         {
             // Standard rotation to look towards a point.
             Quaternion targetLookRotation = Quaternion.LookRotation(lookDirection);
-            
+
             // Apply the manual offset here to correct the model's alignment.
             Quaternion finalRotation = targetLookRotation * Quaternion.Euler(0, _rotationOffset, 0);
 
             // Smoothly rotate the character to the final, corrected rotation.
             transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, Time.deltaTime * _rotationSpeed);
         }
-        
+
         CalculateTurnSpeed();
+    }
+
+    public static void TakeDamage(int amount)
+    {
+        _instance.CurrentHealth -= amount;
+        _instance.CurrentHealth = Mathf.Clamp(_instance.CurrentHealth, 0, 100);
+
+        HealthUI.UpdateHealth(_instance.CurrentHealth);
+    }
+    
+    public static void GetUltimate(int amount)
+    {
+        _instance.CurrentUltimate += amount;
+        _instance.CurrentUltimate = Mathf.Clamp(_instance.CurrentUltimate, 0, 10);
+
+        UltimateUI.UpdateUltimate(_instance.CurrentUltimate);
     }
 
     private void CalculateTurnSpeed()
