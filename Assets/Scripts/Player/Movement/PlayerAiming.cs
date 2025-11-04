@@ -17,7 +17,7 @@ public class PlayerAiming
 
     public void Tick()
     {
-        Plane groundPlane = new Plane(Vector3.up, _playerTransform.position);
+        Plane groundPlane = new(Vector3.up, _playerTransform.position);
         Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
 
         if (groundPlane.Raycast(ray, out float enter))

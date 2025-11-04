@@ -5,8 +5,10 @@ public class PlayerShooting
     private readonly Transform _playerTransform;
     private readonly float _fireRate = 0.25f;
     private readonly ParticleSystem _firePointParticles;
-        
+
     private float _nextFireTime = 0f;
+    
+    private readonly float _maxShootAngle = 60f;
 
     private readonly WeaponBase _weapon;
 
@@ -19,6 +21,12 @@ public class PlayerShooting
 
     public void Tick(Vector3 aimDir)
     {
+        float angle = Vector3.Angle(_playerTransform.forward, aimDir);
+        if (angle > _maxShootAngle)
+        {
+            return;
+        }
+
         if (Input.GetMouseButton(0) && Time.time >= _nextFireTime)
         {
             _nextFireTime = Time.time + _fireRate;

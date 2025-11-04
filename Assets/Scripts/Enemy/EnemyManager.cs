@@ -28,7 +28,10 @@ public class EnemyManager : MonoBehaviour
 
     private void Die()
     {
+        Player.GetUltimate(1);
+
         _isDead = true;
+        
         Debug.Log($"{gameObject.name} is dead!");
 
         gameObject.SetActive(false);

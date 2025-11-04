@@ -14,7 +14,7 @@ public class Spike : MonoBehaviour
         {
             if (other.TryGetComponent<Player>(out var player))
             {
-                player.TakeDamage(_damage);
+                Player.TakeDamage(_damage);
             }
 
             _hasActivated = true;
