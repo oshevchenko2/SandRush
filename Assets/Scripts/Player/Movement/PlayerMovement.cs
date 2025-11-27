@@ -25,6 +25,7 @@ public class PlayerMovement
     // --- Public State ---
     public bool JustDashed { get; private set; }
     public float DashCooldownTimer => _dashCooldownTimer;
+    public Vector3 WorldMoveDirection { get; private set; }
 
     public PlayerMovement(CharacterController controller, Transform cameraTransform, float moveSpeed, float accelerationTime)
     {
@@ -40,8 +41,6 @@ public class PlayerMovement
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         float verticalInput = Input.GetAxisRaw("Vertical");
 
-        // --- Camera-Relative Direction Calculation ---
-        // Get camera's forward and right vectors, then flatten them on the XZ plane.
         Vector3 camForward = _cameraTransform.forward;
         camForward.y = 0;
         camForward.Normalize();
@@ -50,22 +49,17 @@ public class PlayerMovement
         camRight.y = 0;
         camRight.Normalize();
         
-        // Combine inputs with camera vectors to get the final world-space direction.
-        Vector3 moveDirection = (camForward * verticalInput + camRight * horizontalInput).normalized;
+        WorldMoveDirection = (camForward * verticalInput + camRight * horizontalInput).normalized;
 
-        // --- State Handling ---
-        HandleDashState(moveDirection);
+        HandleDashState(WorldMoveDirection);
 
         if (_isDashing)
         {
-            // During a dash, we use the calculated move direction at full dash speed.
-            _controller.Move(moveDirection * _dashSpeed * Time.deltaTime);
+            _controller.Move(WorldMoveDirection * _dashSpeed * Time.deltaTime);
             return;
         }
 
-        // --- Standard Movement ---
-        // Apply regular movement speed to the calculated direction.
-        Vector3 targetVelocity = moveDirection * _moveSpeed;
+        Vector3 targetVelocity = WorldMoveDirection * _moveSpeed;
         _currentMoveVelocity = Vector3.SmoothDamp(_currentMoveVelocity, targetVelocity, ref _velocityDamper, _accelerationTime);
         _controller.Move(_currentMoveVelocity * Time.deltaTime);
     }

@@ -187,14 +187,6 @@ BlendTree:
   m_Name: IdleAndTurning
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: -203655887218126122, guid: 5c0105a5c336df744a994bc51d406d5d, type: 3}
-    m_Threshold: -1
-    m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: MoveX
-    m_Mirror: 0
-  - serializedVersion: 2
     m_Motion: {fileID: -203655887218126122, guid: 21a67acb5afbf18458b1b7240ad9c153, type: 3}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
@@ -202,17 +194,9 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: MoveX
     m_Mirror: 0
-  - serializedVersion: 2
-    m_Motion: {fileID: -203655887218126122, guid: 03a39e604adcd0e408f950e3353720d3, type: 3}
-    m_Threshold: 1
-    m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: MoveX
-    m_Mirror: 0
   m_BlendParameter: TurnSpeed
   m_BlendParameterY: MoveX
-  m_MinThreshold: -1
+  m_MinThreshold: 0
   m_MaxThreshold: 1
   m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
