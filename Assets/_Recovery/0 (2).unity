@@ -23126,15 +23126,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: eb07c974a25731d42810e77de3af7cec, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7
+      value: 0.61
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: eb07c974a25731d42810e77de3af7cec, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7
+      value: 0.61
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: eb07c974a25731d42810e77de3af7cec, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7
+      value: 0.61
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: eb07c974a25731d42810e77de3af7cec, type: 3}
       propertyPath: m_LocalPosition.x
@@ -23142,7 +23142,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: eb07c974a25731d42810e77de3af7cec, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.96
+      value: 0.331
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: eb07c974a25731d42810e77de3af7cec, type: 3}
       propertyPath: m_LocalPosition.z
@@ -26234,7 +26234,7 @@ MonoBehaviour:
   _attackType: 1
   _playerTransform: {fileID: 1822488525883041502}
   _detectionRadius: 15
-  _attackRange: 2
+  _attackRange: 10
   _attackRate: 1
   _bulletPrefab: {fileID: 0}
   _firePoint: {fileID: 0}
@@ -26281,7 +26281,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -26304,7 +26304,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 2.0896256, y: 1.7487284, z: 2.0420244}
   m_Center: {x: 0, y: 0.8736803, z: -0.4994628}
@@ -26373,8 +26373,8 @@ Transform:
   m_GameObject: {fileID: 2026240699}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 4.68, y: 0.96, z: 6.45}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalPosition: {x: 4.68, y: 0.331, z: 6.45}
+  m_LocalScale: {x: 0.61, y: 0.61, z: 0.61}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
