@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerShooting
 {
     private readonly Transform _playerTransform;
+    private readonly Transform _firePoint;
     private readonly float _fireRate = 0.25f;
     private readonly ParticleSystem _firePointParticles;
 
@@ -10,12 +11,13 @@ public class PlayerShooting
     
     private readonly float _maxShootAngle = 60f;
 
-    private readonly WeaponBase _weapon;
+    private WeaponBase _weapon;
 
     public PlayerShooting(Transform playerTransform, Transform firePoint, GameObject bulletPrefab, ParticleSystem fireParticles)
     {
         _playerTransform = playerTransform;
-        _weapon = new BulletWeapon(_playerTransform, firePoint, bulletPrefab);
+        _firePoint = firePoint;
+        _weapon = new BulletWeapon(_playerTransform, _firePoint, bulletPrefab);
         _firePointParticles = fireParticles;
     }
 
@@ -34,5 +36,10 @@ public class PlayerShooting
 
             if (_firePointParticles != null) _firePointParticles.Play();
         }
+    }
+
+    public void EquipWeapon(GameObject bulletPrefab)
+    {
+        _weapon = new BulletWeapon(_playerTransform, _firePoint, bulletPrefab);
     }
 }

@@ -221,4 +221,9 @@ public class Player : MonoBehaviour
             _dashCooldownText.gameObject.SetActive(false);
         }
     }
+
+    public void EquipWeapon(GameObject bulletPrefab)
+    {
+        _shooting.EquipWeapon(bulletPrefab);
+    }
 }

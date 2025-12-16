@@ -6,10 +6,16 @@ public class EnemyManager : MonoBehaviour
 
     private float _currentHealth;
     private bool _isDead;
+    private EnemySpawner _mySpawner;
 
     void Awake()
     {
         _currentHealth = _maxHealth;
+    }
+
+    public void Initialize(EnemySpawner spawner)
+    {
+        _mySpawner = spawner;
     }
 
     public void TakeDamage(float amount)
@@ -32,6 +38,11 @@ public class EnemyManager : MonoBehaviour
 
         _isDead = true;
         
+        if (_mySpawner != null)
+        {
+            _mySpawner.OnEnemyDied(this);
+        }
+
         Debug.Log($"{gameObject.name} is dead!");
 
         gameObject.SetActive(false);
